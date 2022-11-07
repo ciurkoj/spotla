@@ -34,18 +34,10 @@ class _HomeState extends State<Home> {
         if (snapshot.hasData) {
           return ListView.builder(
             shrinkWrap: true,
-            itemCount: snapshot.data!.length,
+            itemCount: snapshot.data?.length ?? 0,
             itemBuilder: (context, index) {
               return PostWidget(post: snapshot.data![index]);
-              // return ListTile(
-              //   leading: CircleAvatar(
-              //     child: Image.network(
-              //         snapshot.data![index].author!.photoUrl.toString()),
-              //   ),
-              //   title: Text(snapshot.data![index].author!.username!),
-              //   subtitle: Text(snapshot.data![index].caption!.text.toString()),
-              //   trailing: Text(DateTime.parse(snapshot.data![index].createdAt.toString()).toIso8601String()),
-              // );
+
             },
           );
         } else if (snapshot.hasError) {

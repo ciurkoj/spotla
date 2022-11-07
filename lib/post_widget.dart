@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:spotlas/models/post.dart';
-import 'package:intl/intl.dart';
 
 class PostWidget extends StatefulWidget {
   final Post? post;
@@ -269,18 +268,20 @@ class _PostWidgetState extends State<PostWidget> with SingleTickerProviderStateM
                     ),
                   ),
                 ),
-                InkWell(
-                  child: Container(
-                    child: const Text(
-                      'View all  comments',
-                      style:  TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 4),
+                // TAGS ARE ALWAYS NULL IN A GIVEN API RESPONSE, SO I'VE CHOSEN
+                // LIKED BY TO PRESENT DYNAMIC LISTS
+                widget.post!.likedBy?.isNotEmpty ?? false ? SizedBox(
+                  height: 40,
+                  child: ListView(
+                    // This next line does the trick.
+                    scrollDirection: Axis.horizontal,
+                    children: widget.post!.likedBy!.map<Widget>((e) => Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: OutlinedButton(onPressed: (){}, child: Text(e!.username!)),
+                    )).toList(),
                   ),
-                  onTap: null,
-                ),
+                ) : Container(),
+                // DATE
                 Container(
                   child: Text(
                     "${DateTime.now().difference(DateTime.parse(widget.post!.createdAt!)).inDays.toString()} days ago ",
