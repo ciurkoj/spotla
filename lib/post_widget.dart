@@ -14,12 +14,14 @@ class PostWidget extends StatefulWidget {
   }
 }
 
-class _PostWidgetState extends State<PostWidget> {
+class _PostWidgetState extends State<PostWidget> with SingleTickerProviderStateMixin  {
   bool mybool = true;
   Size? _size;
+  TabController? controller;
   @override
   void initState() {
     super.initState();
+    controller = TabController(length: widget.post!.media!.length, vsync: this);
   }
 
   @override
@@ -47,25 +49,14 @@ class _PostWidgetState extends State<PostWidget> {
               SizedBox(
               height: _size?.height ?? 0,
               child: PageView.builder(
+                onPageChanged: (int page){
+                  controller?.index = page;
+                },
                 controller: PageController(viewportFraction: 1.15),
                   itemCount: widget.post!.media!.length,
                   pageSnapping: true,
                   padEnds: false,
                   itemBuilder: (context,pagePosition){
-                    Future<Size> _calculateImageDimension() {
-                      Completer<Size> completer = Completer();
-                      Image image = Image.network("https://i.stack.imgur.com/lkd0a.png");
-                      image.image.resolve(const ImageConfiguration()).addListener(
-                        ImageStreamListener(
-                              (ImageInfo image, bool synchronousCall) {
-                            var myImage = image.image;
-                            Size size = Size(myImage.width.toDouble(), myImage.height.toDouble());
-                            completer.complete(size);
-                          },
-                        ),
-                      );
-                      return completer.future;
-                    }
                     Image image = Image.network(widget.post!.media![pagePosition]!.url!);
                     _calculateImageDimension().then((size) {
                       setState(() {
@@ -80,7 +71,8 @@ class _PostWidgetState extends State<PostWidget> {
                   gradient: LinearGradient(
                     colors: [
                       Colors.black38,
-                      Colors.black38,
+                      Colors.black26,
+                      Colors.black26,
                       Colors.transparent
                     ],
                     begin: Alignment.topCenter,
@@ -167,7 +159,16 @@ class _PostWidgetState extends State<PostWidget> {
                     ),
                   ],
                 ),
-              )],
+              ),
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                    child: TabPageSelector(controller: controller,)),
+              ),
+            )
+            ],
           ),
           // LIKE, COMMENT SECTION OF THE POST
           Row(
@@ -256,5 +257,20 @@ class _PostWidgetState extends State<PostWidget> {
         ],
       ),
     );
+  }
+
+  Future<Size> _calculateImageDimension() {
+    Completer<Size> completer = Completer();
+    Image image = Image.network("https://i.stack.imgur.com/lkd0a.png");
+    image.image.resolve(const ImageConfiguration()).addListener(
+      ImageStreamListener(
+            (ImageInfo image, bool synchronousCall) {
+          var myImage = image.image;
+          Size size = Size(myImage.width.toDouble(), myImage.height.toDouble());
+          completer.complete(size);
+        },
+      ),
+    );
+    return completer.future;
   }
 }
