@@ -283,7 +283,7 @@ class _PostWidgetState extends State<PostWidget> with SingleTickerProviderStateM
                 ),
                 Container(
                   child: Text(
-                    DateFormat.yMd().format(DateTime.parse(widget.post!.createdAt!)).toString(),
+                    "${DateTime.now().difference(DateTime.parse(widget.post!.createdAt!)).inDays.toString()} days ago ",
                     style: TextStyle(
                       color: Theme.of(context).textTheme.caption!.color,
                     ),
