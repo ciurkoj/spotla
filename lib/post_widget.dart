@@ -15,9 +15,10 @@ class PostWidget extends StatefulWidget {
 }
 
 class _PostWidgetState extends State<PostWidget> with SingleTickerProviderStateMixin  {
-  bool mybool = true;
   Size? _size;
   TabController? controller;
+  bool saved = false;
+  bool favourite = false;
   @override
   void initState() {
     super.initState();
@@ -167,31 +168,73 @@ class _PostWidgetState extends State<PostWidget> with SingleTickerProviderStateM
                   alignment: Alignment.bottomCenter,
                     child: TabPageSelector(controller: controller,)),
               ),
-            )
+            ),
+              Positioned.fill(
+                child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left:8.0,bottom:8.0,right:24.0),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: CircleAvatar(
+                              radius: 34,
+                              backgroundColor: Colors.white,
+                              child: CircleAvatar(
+                                radius: 30,
+                                backgroundImage: NetworkImage(
+                                    widget.post!.spot!.logo!.url!
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: 34,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                              Text(widget.post!.spot!.name!, style: TextStyle(
+                                  fontSize: Theme.of(context).textTheme.bodyText1!.fontSize,
+                                  color:Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),),
+                              Text("${widget.post!.spot!.types!.first.name!}・${widget.post!.spot!.location!.display}", style: TextStyle(
+                                  fontSize: Theme.of(context).textTheme.bodyText1!.fontSize,
+                                  color:Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),)
+                            ],),
+                          ),
+                          const Spacer(),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: GestureDetector(
+                              onTap: () => saved = !saved,
+                              child: Image(image: AssetImage(saved ? 'assets/star.png' : 'assets/star_border.png'),
+                                  height: 34,color: saved ? Colors.yellow : Colors.white),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),),
+              )
             ],
           ),
           // LIKE, COMMENT SECTION OF THE POST
-          Row(
-            children: <Widget>[
-              Container(color: Colors.white),
-              const IconButton(
-                icon: Icon(
-                  Icons.comment_outlined,
-                ),
-                onPressed: null
-              ),
-              IconButton(
-                  icon: const Icon(
-                    Icons.send,
-                  ),
-                  onPressed: () {}),
-              Expanded(
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: IconButton(
-                        icon: const Icon(Icons.bookmark_border), onPressed: () {}),
-                  ))
-            ],
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0, top : 12.0, right: 12.0, bottom: 8.0),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Image(image: AssetImage('assets/map_border.png'),height: 30),
+                Image(image: AssetImage('assets/comments_border.png'),height: 30),
+                GestureDetector(
+                  onTap: ()=> favourite = !favourite,
+                    child: Image(image: AssetImage( favourite ? 'assets/heart.png' : 'assets/heart_border.png'),height: 30, color: favourite ? Colors.pink : null)),
+                Image(image: AssetImage('assets/send_border.png'),height: 30),
+                ],
+            ),
           ),
           //DESCRIPTION AND NUMBER OF COMMENTS
           Container(
@@ -200,31 +243,27 @@ class _PostWidgetState extends State<PostWidget> with SingleTickerProviderStateM
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                DefaultTextStyle(
-                    style: Theme.of(context)
-                        .textTheme
-                        .subtitle2!
-                        .copyWith(fontWeight: FontWeight.w800),
-                    child: Text(
-                      widget.post!.numberOfLikes!.toString(),
-                      style: Theme.of(context).textTheme.bodyText2,
-                    )),
+                Text(
+                  "${widget.post!.numberOfLikes!.toString()} likes ",
+                  style: Theme.of(context).textTheme.bodyText2,
+                ),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.only(
-                    top: 8,
-                  ),
                   child: RichText(
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: widget.post!.author!.username!,
+                          text: "${widget.post!.author!.username!} ",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
+                            color: Colors.black
                           ),
                         ),
                         TextSpan(
                           text: widget.post!.caption!.text!,
+                            style: const TextStyle(
+                                color: Colors.black
+                            )
                         ),
                       ],
                     ),
