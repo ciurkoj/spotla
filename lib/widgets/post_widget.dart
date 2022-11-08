@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:spotlas/like_animation.dart';
+import 'package:provider/provider.dart';
+import 'package:spotlas/widgets/like_animation.dart';
 import 'package:spotlas/models/post.dart';
+
+import '../change notifiers/post_list_change_notifier.dart';
 
 class PostWidget extends StatefulWidget {
   final Post? post;
@@ -26,10 +29,14 @@ class _PostWidgetState extends State<PostWidget>
   int length = 40;
   bool isLikeAnimating = false;
 
+  late PostListChangeNotifier postListCN;
+
+
   @override
   void initState() {
     super.initState();
     controller = TabController(length: widget.post!.media!.length, vsync: this);
+
   }
 
   @override
@@ -41,6 +48,7 @@ class _PostWidgetState extends State<PostWidget>
 
   @override
   Widget build(BuildContext context) {
+    postListCN = Provider.of<PostListChangeNotifier>(context);
     return Container(
       // boundary needed for web
       decoration: BoxDecoration(
@@ -53,6 +61,11 @@ class _PostWidgetState extends State<PostWidget>
         children: [
           GestureDetector(
             onDoubleTap: (){
+              if(favourite){
+                postListCN.removeFavourite(widget.post!);
+              }else{
+                postListCN.setFavourite(widget.post!);
+              }
               setState(() {
                 favourite = !favourite;
                 isLikeAnimating = favourite;
@@ -242,7 +255,14 @@ class _PostWidgetState extends State<PostWidget>
                           Padding(
                             padding: const EdgeInsets.only(left: 16.0),
                             child: GestureDetector(
-                              onTap: () => saved = !saved,
+                              onTap: () {
+                                if(!saved){
+                                  postListCN.setSaved(widget.post!);
+                                } else{
+                                  postListCN.removeSaved(widget.post!);
+                                }
+                                saved = !saved;
+                              },
                               child: Image(
                                   image: AssetImage(saved
                                       ? 'assets/star.png'

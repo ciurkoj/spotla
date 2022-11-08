@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:spotlas/models/post.dart';
-import 'package:spotlas/post_widget.dart';
-import 'package:spotlas/web_requests.dart';
+import 'package:spotlas/widgets/post_widget.dart';
+
+import 'change notifiers/post_list_change_notifier.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -13,12 +15,11 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<Post>? posts;
+  late PostListChangeNotifier postListCN;
 
   @override
   void initState() {
     super.initState();
-    fetchPosts().then((value) => posts = value);
   }
 
   @override
@@ -28,8 +29,9 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    postListCN = Provider.of<PostListChangeNotifier>(context);
     return  FutureBuilder<List<Post>?>(
-      future: fetchPosts(),
+      future: postListCN.fetchPosts(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return ListView.builder(
@@ -48,7 +50,4 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Future<List<Post>?> fetchPosts() async {
-    return await WebRequests.fetchPosts();
-  }
 }
