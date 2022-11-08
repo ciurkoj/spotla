@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:spotlas/like_animation.dart';
 import 'package:spotlas/models/post.dart';
 
 class PostWidget extends StatefulWidget {
@@ -23,6 +24,8 @@ class _PostWidgetState extends State<PostWidget>
   bool descTextShowFlag = false;
   bool showAll = true;
   int length = 40;
+  bool isLikeAnimating = false;
+
   @override
   void initState() {
     super.initState();
@@ -48,174 +51,87 @@ class _PostWidgetState extends State<PostWidget>
       ),
       child: Column(
         children: [
-          Stack(
-            children: [
-              SizedBox(
-                height: _size?.height ?? 0,
-                child: PageView.builder(
-                    onPageChanged: (int page) {
-                      controller?.index = page;
-                    },
-                    controller: PageController(viewportFraction: 1.15),
-                    itemCount: widget.post!.media!.length,
-                    pageSnapping: true,
-                    padEnds: false,
-                    itemBuilder: (context, pagePosition) {
-                      Image image = Image.network(
-                          widget.post!.media![pagePosition]!.url!);
-                      _calculateImageDimension().then((size) {
-                        if (mounted) {
-                          setState(() {
-                            _size = size;
-                          });
-                        }
-                      });
-                      return image;
-                    }),
-              ),
-              Container(
-                decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [
-                      Colors.black38,
-                      Colors.black26,
-                      Colors.black26,
-                      Colors.transparent
-                    ],
-                        begin: Alignment.topCenter,
-                        end: AlignmentDirectional.bottomCenter)),
-                // color: Colors.black12,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 4,
-                  horizontal: 16,
-                ).copyWith(right: 0),
-                child: Row(
-                  children: <Widget>[
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: Colors.pinkAccent,
-                      child: CircleAvatar(
-                        radius: 20,
-                        backgroundImage:
-                            NetworkImage(widget.post!.author!.photoUrl!),
-                      ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: 8,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              widget.post!.author!.username!,
-                              style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .headline6!
-                                    .fontSize,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              widget.post!.author!.fullName!,
-                              style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1!
-                                    .fontSize,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        showDialog(
-                          useRootNavigator: false,
-                          context: context,
-                          builder: (context) {
-                            return Dialog(
-                              child: ListView(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 16),
-                                  shrinkWrap: true,
-                                  children: [
-                                    'Delete',
-                                  ]
-                                      .map(
-                                        (e) => InkWell(
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 12, horizontal: 16),
-                                            child: Text(e),
-                                          ),
-                                        ),
-                                      )
-                                      .toList()),
-                            );
-                          },
-                        );
+          GestureDetector(
+            onDoubleTap: (){
+              setState(() {
+                favourite = !favourite;
+                isLikeAnimating = favourite;
+              });
+            },
+            child: Stack(
+              children: [
+                SizedBox(
+                  height: _size?.height ?? 0,
+                  child: PageView.builder(
+                      onPageChanged: (int page) {
+                        controller?.index = page;
                       },
-                      icon: const Icon(Icons.more_vert),
-                    ),
-                  ],
+                      controller: PageController(viewportFraction: 1.15),
+                      itemCount: widget.post!.media!.length,
+                      pageSnapping: true,
+                      padEnds: false,
+                      itemBuilder: (context, pagePosition) {
+                        Image image = Image.network(
+                            widget.post!.media![pagePosition]!.url!);
+                        _calculateImageDimension().then((size) {
+                          if (mounted) {
+                            setState(() {
+                              _size = size;
+                            });
+                          }
+                        });
+                        return image;
+                      }),
                 ),
-              ),
-              Positioned.fill(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: TabPageSelector(
-                        controller: controller,
-                      )),
-                ),
-              ),
-              Positioned.fill(
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 8.0, bottom: 8.0, right: 24.0),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: CircleAvatar(
-                            radius: 34,
-                            backgroundColor: Colors.white,
-                            child: CircleAvatar(
-                              radius: 30,
-                              backgroundImage:
-                                  NetworkImage(widget.post!.spot!.logo!.url!),
-                            ),
-                          ),
+                Container(
+                  decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: [
+                        Colors.black38,
+                        Colors.black26,
+                        Colors.black26,
+                        Colors.transparent
+                      ],
+                          begin: Alignment.topCenter,
+                          end: AlignmentDirectional.bottomCenter)),
+                  // color: Colors.black12,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4,
+                    horizontal: 16,
+                  ).copyWith(right: 0),
+                  child: Row(
+                    children: <Widget>[
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Colors.pinkAccent,
+                        child: CircleAvatar(
+                          radius: 20,
+                          backgroundImage:
+                              NetworkImage(widget.post!.author!.photoUrl!),
                         ),
-                        Container(
-                          height: 34,
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 8,
+                          ),
                           child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                            children: <Widget>[
                               Text(
-                                widget.post!.spot!.name!,
+                                widget.post!.author!.username!,
                                 style: TextStyle(
                                   fontSize: Theme.of(context)
                                       .textTheme
-                                      .bodyText1!
+                                      .headline6!
                                       .fontSize,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
-                                "${widget.post!.spot!.types!.first.name!}・${widget.post!.spot!.location!.display}",
+                                widget.post!.author!.fullName!,
                                 style: TextStyle(
                                   fontSize: Theme.of(context)
                                       .textTheme
@@ -228,25 +144,145 @@ class _PostWidgetState extends State<PostWidget>
                             ],
                           ),
                         ),
-                        const Spacer(),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 16.0),
-                          child: GestureDetector(
-                            onTap: () => saved = !saved,
-                            child: Image(
-                                image: AssetImage(saved
-                                    ? 'assets/star.png'
-                                    : 'assets/star_border.png'),
-                                height: 34,
-                                color: saved ? Colors.yellow : Colors.white),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          showDialog(
+                            useRootNavigator: false,
+                            context: context,
+                            builder: (context) {
+                              return Dialog(
+                                child: ListView(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 16),
+                                    shrinkWrap: true,
+                                    children: [
+                                      'Delete',
+                                    ]
+                                        .map(
+                                          (e) => InkWell(
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                  vertical: 12, horizontal: 16),
+                                              child: Text(e),
+                                            ),
+                                          ),
+                                        )
+                                        .toList()),
+                              );
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.more_vert),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: TabPageSelector(
+                          controller: controller,
+                        )),
+                  ),
+                ),
+                Positioned.fill(
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8.0, bottom: 8.0, right: 24.0),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: CircleAvatar(
+                              radius: 34,
+                              backgroundColor: Colors.white,
+                              child: CircleAvatar(
+                                radius: 30,
+                                backgroundImage:
+                                    NetworkImage(widget.post!.spot!.logo!.url!),
+                              ),
+                            ),
                           ),
-                        )
-                      ],
+                          Container(
+                            height: 34,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.post!.spot!.name!,
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .fontSize,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  "${widget.post!.spot!.types!.first.name!}・${widget.post!.spot!.location!.display}",
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .fontSize,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: GestureDetector(
+                              onTap: () => saved = !saved,
+                              child: Image(
+                                  image: AssetImage(saved
+                                      ? 'assets/star.png'
+                                      : 'assets/star_border.png'),
+                                  height: 34,
+                                  color: saved ? Colors.yellow : Colors.white),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              )
-            ],
+                Positioned.fill(
+                  child: Align(
+                    alignment: AlignmentDirectional.center,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 1000),
+                      opacity: isLikeAnimating ? 1 : 0,
+                      child: LikeAnimation(
+                        isAnimating: isLikeAnimating,
+                        child: const Icon(
+                          Icons.favorite,
+                          color: Colors.pink,
+                          size: 100,
+                        ),
+                        duration: const Duration(
+                            milliseconds: 2000
+                        ),
+                        onEnd: () {
+                          setState(() {
+                            isLikeAnimating = false;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           // LIKE, COMMENT SECTION OF THE POST
           Padding(
