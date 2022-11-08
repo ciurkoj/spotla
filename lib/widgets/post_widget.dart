@@ -31,20 +31,16 @@ class _PostWidgetState extends State<PostWidget>
 
   late PostListChangeNotifier postListCN;
 
-
   @override
   void initState() {
     super.initState();
     controller = TabController(length: widget.post!.media!.length, vsync: this);
-
   }
 
   @override
   void dispose() {
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -60,10 +56,10 @@ class _PostWidgetState extends State<PostWidget>
       child: Column(
         children: [
           GestureDetector(
-            onDoubleTap: (){
-              if(favourite){
+            onDoubleTap: () {
+              if (favourite) {
                 postListCN.removeFavourite(widget.post!);
-              }else{
+              } else {
                 postListCN.setFavourite(widget.post!);
               }
               setState(() {
@@ -83,6 +79,7 @@ class _PostWidgetState extends State<PostWidget>
                       itemCount: widget.post!.media!.length,
                       pageSnapping: true,
                       padEnds: false,
+
                       itemBuilder: (context, pagePosition) {
                         Image image = Image.network(
                             widget.post!.media![pagePosition]!.url!);
@@ -97,16 +94,7 @@ class _PostWidgetState extends State<PostWidget>
                       }),
                 ),
                 Container(
-                  decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                          colors: [
-                        Colors.black38,
-                        Colors.black26,
-                        Colors.black26,
-                        Colors.transparent
-                      ],
-                          begin: Alignment.topCenter,
-                          end: AlignmentDirectional.bottomCenter)),
+
                   // color: Colors.black12,
                   padding: const EdgeInsets.symmetric(
                     vertical: 4,
@@ -135,6 +123,10 @@ class _PostWidgetState extends State<PostWidget>
                               Text(
                                 widget.post!.author!.username!,
                                 style: TextStyle(
+                                  shadows: const [
+                                    Shadow(
+                                        color: Colors.black, blurRadius: 20)
+                                  ],
                                   fontSize: Theme.of(context)
                                       .textTheme
                                       .headline6!
@@ -146,6 +138,10 @@ class _PostWidgetState extends State<PostWidget>
                               Text(
                                 widget.post!.author!.fullName!,
                                 style: TextStyle(
+                                  shadows: const [
+                                    Shadow(
+                                        color: Colors.black, blurRadius: 20)
+                                  ],
                                   fontSize: Theme.of(context)
                                       .textTheme
                                       .bodyText1!
@@ -166,8 +162,8 @@ class _PostWidgetState extends State<PostWidget>
                             builder: (context) {
                               return Dialog(
                                 child: ListView(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 16),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
                                     shrinkWrap: true,
                                     children: [
                                       'Delete',
@@ -175,8 +171,10 @@ class _PostWidgetState extends State<PostWidget>
                                         .map(
                                           (e) => InkWell(
                                             child: Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                  vertical: 12, horizontal: 16),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12,
+                                                      horizontal: 16),
                                               child: Text(e),
                                             ),
                                           ),
@@ -229,6 +227,10 @@ class _PostWidgetState extends State<PostWidget>
                                 Text(
                                   widget.post!.spot!.name!,
                                   style: TextStyle(
+                                    shadows: const [
+                                      Shadow(
+                                          color: Colors.black, blurRadius: 20)
+                                    ],
                                     fontSize: Theme.of(context)
                                         .textTheme
                                         .bodyText1!
@@ -240,6 +242,10 @@ class _PostWidgetState extends State<PostWidget>
                                 Text(
                                   "${widget.post!.spot!.types!.first.name!}・${widget.post!.spot!.location!.display}",
                                   style: TextStyle(
+                                    shadows: const [
+                                      Shadow(
+                                          color: Colors.black, blurRadius: 20)
+                                    ],
                                     fontSize: Theme.of(context)
                                         .textTheme
                                         .bodyText1!
@@ -256,9 +262,9 @@ class _PostWidgetState extends State<PostWidget>
                             padding: const EdgeInsets.only(left: 16.0),
                             child: GestureDetector(
                               onTap: () {
-                                if(!saved){
+                                if (!saved) {
                                   postListCN.setSaved(widget.post!);
-                                } else{
+                                } else {
                                   postListCN.removeSaved(widget.post!);
                                 }
                                 saved = !saved;
@@ -289,9 +295,7 @@ class _PostWidgetState extends State<PostWidget>
                           color: Colors.pink,
                           size: 100,
                         ),
-                        duration: const Duration(
-                            milliseconds: 2000
-                        ),
+                        duration: const Duration(milliseconds: 2000),
                         onEnd: () {
                           setState(() {
                             isLikeAnimating = false;
@@ -377,6 +381,8 @@ class _PostWidgetState extends State<PostWidget>
                             : TextSpan(),
                       ],
                     ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 18),
                   ),
                 ),
