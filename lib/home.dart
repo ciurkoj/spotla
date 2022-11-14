@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:spotlas/models/post.dart';
 import 'package:spotlas/widgets/post_widget.dart';
 
@@ -29,25 +28,66 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    postListCN = Provider.of<PostListChangeNotifier>(context);
-    return  FutureBuilder<List<Post>?>(
-      future: postListCN.fetchPosts(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return ListView.builder(
-            shrinkWrap: true,
-            itemCount: snapshot.data?.length ?? 0,
-            itemBuilder: (context, index) {
-              return PostWidget(post: snapshot.data![index]);
-
-            },
+    return Center(
+      child: FutureBuilder<List<Post>>(
+        future: PostListChangeNotifier().fetchPosts(),
+        builder: (BuildContext context, AsyncSnapshot<List<Post>> snapshot) {
+          List<Widget> children;
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            children = <Widget>[
+              ListView.builder(
+                controller: ScrollController(),
+                shrinkWrap: true,
+                itemCount: snapshot.data?.length ?? 0,
+                itemBuilder: (context, index) {
+                  return PostWidget(post: snapshot.data![index]);
+                },
+              )
+            ];
+          } else if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasError) {
+            children = <Widget>[
+              const Icon(
+                Icons.error,
+                color: Colors.red,
+                size: 100,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 30),
+                child: Text(
+                  'Error: ${snapshot.error}',
+                  style: const TextStyle(fontSize: 20),
+                ),
+              )
+            ];
+          } else {
+            children = <Widget>[
+              Column(
+                children: const [
+                  SizedBox(
+                    child: CircularProgressIndicator(
+                      color: Colors.blue,
+                    ),
+                    width: 80,
+                    height: 80,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 30),
+                    child: Text(
+                      'Retrieving Data',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  )
+                ],
+              ),
+            ];
+          }
+          return ListView(
+            children: children,
           );
-        } else if (snapshot.hasError) {
-          return Text('${snapshot.error}');
-        }
-        return const CircularProgressIndicator();
-      },
+        },
+      ),
     );
   }
-
 }

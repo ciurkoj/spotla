@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
-          scaffoldBackgroundColor: Colors.white,
+          scaffoldBackgroundColor: const Color(0xFCFFFFFF),
           primarySwatch: Colors.blue,
         ),
         home: const Scaffold(body: Home()),

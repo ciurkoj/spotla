@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:spotlas/widgets/like_animation.dart';
 import 'package:spotlas/models/post.dart';
@@ -46,7 +47,6 @@ class _PostWidgetState extends State<PostWidget>
   Widget build(BuildContext context) {
     postListCN = Provider.of<PostListChangeNotifier>(context);
     return Container(
-      // boundary needed for web
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black26),
       ),
@@ -54,6 +54,7 @@ class _PostWidgetState extends State<PostWidget>
         vertical: 10,
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           GestureDetector(
             onDoubleTap: () {
@@ -70,32 +71,66 @@ class _PostWidgetState extends State<PostWidget>
             child: Stack(
               children: [
                 SizedBox(
-                  height: _size?.height ?? 0,
-                  child: PageView.builder(
-                      onPageChanged: (int page) {
-                        controller?.index = page;
-                      },
-                      controller: PageController(viewportFraction: 1.15),
-                      itemCount: widget.post!.media!.length,
-                      pageSnapping: true,
-                      padEnds: false,
-
-                      itemBuilder: (context, pagePosition) {
-                        Image image = Image.network(
-                            widget.post!.media![pagePosition]!.url!);
-                        _calculateImageDimension().then((size) {
-                          if (mounted) {
-                            setState(() {
-                              _size = size;
-                            });
+                  height: _size?.height ?? 300,
+                  child: MeasureSize(
+                    onChange: (Size value) {
+                      if (mounted) {
+                        setState(() {
+                          if (_size != null) {
+                            double x = value.width / _size!.width;
+                            _size = Size(value.width, value.height * x);
                           }
                         });
-                        return image;
-                      }),
+                      }
+                    },
+                    child: PageView.builder(
+                        onPageChanged: (int page) {
+                          controller?.index = page;
+                        },
+                        itemCount: widget.post!.media!.length,
+                        pageSnapping: true,
+                        padEnds: false,
+                        itemBuilder: (context, pagePosition) {
+                          Image image = Image.network(
+                            widget.post!.media![pagePosition]!.url!,
+                            loadingBuilder: (BuildContext context, Widget child,
+                                ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text("Loading media..."),
+                                    ),
+                                    CircularProgressIndicator(
+                                      value: loadingProgress
+                                                  .expectedTotalBytes !=
+                                              null
+                                          ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                          _calculateImageDimension(image).then((size) {
+                            if (mounted && _size == null) {
+                              setState(() {
+                                _size = size;
+                              });
+                            }
+                          });
+                          return image;
+                        }),
+                  ),
                 ),
                 Container(
-
-                  // color: Colors.black12,
                   padding: const EdgeInsets.symmetric(
                     vertical: 4,
                     horizontal: 16,
@@ -124,8 +159,7 @@ class _PostWidgetState extends State<PostWidget>
                                 widget.post!.author!.username!,
                                 style: TextStyle(
                                   shadows: const [
-                                    Shadow(
-                                        color: Colors.black, blurRadius: 20)
+                                    Shadow(color: Colors.black, blurRadius: 20)
                                   ],
                                   fontSize: Theme.of(context)
                                       .textTheme
@@ -139,8 +173,7 @@ class _PostWidgetState extends State<PostWidget>
                                 widget.post!.author!.fullName!,
                                 style: TextStyle(
                                   shadows: const [
-                                    Shadow(
-                                        color: Colors.black, blurRadius: 20)
+                                    Shadow(color: Colors.black, blurRadius: 20)
                                   ],
                                   fontSize: Theme.of(context)
                                       .textTheme
@@ -219,7 +252,7 @@ class _PostWidgetState extends State<PostWidget>
                               ),
                             ),
                           ),
-                          Container(
+                          SizedBox(
                             height: 34,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,17 +291,17 @@ class _PostWidgetState extends State<PostWidget>
                             ),
                           ),
                           const Spacer(),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                if (!saved) {
-                                  postListCN.setSaved(widget.post!);
-                                } else {
-                                  postListCN.removeSaved(widget.post!);
-                                }
-                                saved = !saved;
-                              },
+                          GestureDetector(
+                            onTap: () {
+                              if (!saved) {
+                                postListCN.setSaved(widget.post!);
+                              } else {
+                                postListCN.removeSaved(widget.post!);
+                              }
+                              saved = !saved;
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 16.0),
                               child: Image(
                                   image: AssetImage(saved
                                       ? 'assets/star.png'
@@ -315,19 +348,28 @@ class _PostWidgetState extends State<PostWidget>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                Image(image: AssetImage('assets/map_border.png'), height: 30),
-                Image(
+                const Image(
+                    image: AssetImage('assets/map_border.png'), height: 30),
+                const Image(
                     image: AssetImage('assets/comments_border.png'),
                     height: 30),
                 GestureDetector(
-                    onTap: () => favourite = !favourite,
-                    child: Image(
-                        image: AssetImage(favourite
-                            ? 'assets/heart.png'
-                            : 'assets/heart_border.png'),
-                        height: 30,
-                        color: favourite ? Colors.pink : null)),
-                Image(image: AssetImage('assets/send_border.png'), height: 30),
+                    onTap: () => {
+                          setState(() {
+                            favourite = !favourite;
+                          })
+                        },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image(
+                          image: AssetImage(favourite
+                              ? 'assets/heart.png'
+                              : 'assets/heart_border.png'),
+                          height: 30,
+                          color: favourite ? Colors.pink : null),
+                    )),
+                const Image(
+                    image: AssetImage('assets/send_border.png'), height: 30),
               ],
             ),
           ),
@@ -373,17 +415,17 @@ class _PostWidgetState extends State<PostWidget>
                                   },
                                   child: Text(
                                     showAll ? ' more' : ' less',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         color: Colors.grey, fontSize: 18),
                                   ),
                                 ),
                               )
-                            : TextSpan(),
+                            : const TextSpan(),
                       ],
                     ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 18),
                   ),
                 ),
                 widget.post!.likedBy?.isNotEmpty ?? false
@@ -421,9 +463,8 @@ class _PostWidgetState extends State<PostWidget>
     );
   }
 
-  Future<Size> _calculateImageDimension() {
+  Future<Size> _calculateImageDimension(Image image) {
     Completer<Size> completer = Completer();
-    Image image = Image.network("https://i.stack.imgur.com/lkd0a.png");
     image.image.resolve(const ImageConfiguration()).addListener(
       ImageStreamListener(
         (ImageInfo image, bool synchronousCall) {
@@ -434,5 +475,48 @@ class _PostWidgetState extends State<PostWidget>
       ),
     );
     return completer.future;
+  }
+}
+
+typedef OnWidgetSizeChange = void Function(Size size);
+
+class MeasureSizeRenderObject extends RenderProxyBox {
+  Size? oldSize;
+  OnWidgetSizeChange onChange;
+
+  MeasureSizeRenderObject(this.onChange);
+
+  @override
+  void performLayout() {
+    super.performLayout();
+
+    Size newSize = child!.size;
+    if (oldSize == newSize) return;
+
+    oldSize = newSize;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onChange(newSize);
+    });
+  }
+}
+
+class MeasureSize extends SingleChildRenderObjectWidget {
+  final OnWidgetSizeChange onChange;
+
+  const MeasureSize({
+    Key? key,
+    required this.onChange,
+    required Widget child,
+  }) : super(key: key, child: child);
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return MeasureSizeRenderObject(onChange);
+  }
+
+  @override
+  void updateRenderObject(
+      BuildContext context, covariant MeasureSizeRenderObject renderObject) {
+    renderObject.onChange = onChange;
   }
 }
