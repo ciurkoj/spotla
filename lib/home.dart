@@ -15,7 +15,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
+  bool hasLoaded = false;
   @override
   void initState() {
     super.initState();
@@ -35,7 +35,13 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _handleRefresh() async {;
+    setState(() {
+      hasLoaded = false;
+    });
   PostListChangeNotifier().fetchPosts().then((res) async {
+    setState(() {
+      hasLoaded = true;
+    });
       showSnack();
     });
   }
@@ -114,7 +120,7 @@ class _HomeState extends State<Home> {
                 strokeWidth: 3,
                 triggerMode: RefreshIndicatorTriggerMode.onEdge,
                 onRefresh: _handleRefresh,
-                child: ListView(children: children)
+                child: hasLoaded ? ListView(children: children) : Center(child: CircularProgressIndicator())
               );
             }));
   }
