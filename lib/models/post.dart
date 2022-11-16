@@ -129,11 +129,11 @@ class Author {
 
 @JsonSerializable()
 class Media {
-  final String? url;
+  String? url;
   @JsonKey(name: 'blur_hash')
   final String? blurHash;
   final String? type;
-  const Media({
+  Media({
     this.url,
     this.blurHash,
     this.type,
