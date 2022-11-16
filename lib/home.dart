@@ -15,7 +15,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  bool hasLoaded = false;
+  bool? hasLoaded;
   @override
   void initState() {
     super.initState();
@@ -120,7 +120,7 @@ class _HomeState extends State<Home> {
                 strokeWidth: 3,
                 triggerMode: RefreshIndicatorTriggerMode.onEdge,
                 onRefresh: _handleRefresh,
-                child: hasLoaded ? ListView(children: children) : Center(child: CircularProgressIndicator())
+                child: hasLoaded ?? true ? ListView(children: children) : Center(child: CircularProgressIndicator())
               );
             }));
   }
