@@ -1,20 +1,11 @@
-fl# spotlas
+# Spotlas is one of my recruitment tasks. 
 
-A new Flutter project.
+Based on a given design template, I've created a flutter app that fetches data from an API, serialises it and presents it to a user on an instagram-like feed. User can save a post using a star button or double tap to like the post. 
+Each Post Widget is fetched via Future builder and then displayed in a ListView built by a List builder. The feed can be refreshed by dragging the list down. 
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+To run the app, please use ``` flutter pub get && flutter run```
 
 https://user-images.githubusercontent.com/44451303/202294193-81739b49-a564-4428-885d-ad8519d4f579.mp4
 
